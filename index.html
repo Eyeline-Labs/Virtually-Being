@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Virtually Being: Customizing Camera-Controllable Video Diffusion Models with Multi-View Performance Captures">
+  <meta name="keywords" content="Video Generation, Customization, Camera Control, Multi-view, 4DGS, Diffusion">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Virtually Being</title>
+
+  <!-- VChain fonts & styles -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/bulma.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./assets/css/index.css">
+
+  <!-- VChain JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./assets/js/fontawesome.all.min.js"></script>
+  <script src="./assets/js/bulma-carousel.min.js"></script>
+  <script src="./assets/js/bulma-slider.min.js"></script>
+  <script src="./assets/js/index.js"></script>
+
+  <!-- Optional: Chalkduster for caption row used in VB figures -->
+  <link href="https://fonts.cdnfonts.com/css/chalkduster" rel="stylesheet">
+
+  <style>
+    /* Minor helpers to mimic VB look inside VChain scaffold */
+    .vb-card {
+      border: 1px solid #e5e5e5;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      margin: 16px auto;
+      max-width: 1100px;
+      background: #fff;
+    }
+    .vb-card video, .vb-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .vb-card .card-body {
+      padding: 10px 14px 12px;
+    }
+    .vb-cap-table { width: 100%; }
+    .vb-cap-table td {
+      text-align: center;
+      font-family: 'Segoe UI','Helvetica Neue', Arial, sans-serif;
+      padding: 4px 6px;
+    }
+    .vb-cap-table .chalk { font-family: Chalkduster, serif; }
+
+    /* VB navigation table kept */
+    .menu-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      text-align: center;
+      background: #fff;
+    }
+    .menu-table td {
+      padding: 12px 10px;
+      border: 1px solid #eee;
+      font-size: 16px;
+    }
+    .menu-link {
+      text-decoration: none;
+      color: #3273dc; /* Bulma primary */
+      font-weight: 600;
+      transition: color 0.2s, text-decoration 0.2s;
+    }
+    .menu-link:hover {
+      color: #2759a5;
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .menu-table td { padding: 10px 6px; font-size: 14px; }
+    }
+
+    /* Section headers like VChain */
+    .vb-section-title { margin-top: 6px; }
+    .hero.is-light .title.is-3 { margin-bottom: 10px; }
+
+    /* Tighten hero spacing to match VChain feel */
+    .hero .hero-body { padding-top: 2.5rem; padding-bottom: 1.5rem; }
+
+    /* Container width consistent with VChain */
+    .container.is-max-desktop { max-width: 1100px; }
+
+    /* Make slides stack nicely */
+    .vb-slide-wrap { padding: 0 10px; }
+  </style>
+</head>
+<body>
+
+<!-- Title + Authors + Links (VChain hero style) -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            <span style="color:#a9195c; font-weight:bold; font-style:italic;">Virtually Being</span>: Customizing Camera-Controllable Video Diffusion Models with Multi-View Performance Captures
+          </h1>
+          <p class="subtitle is-4" style="margin-top:0.25rem;">SIGGRAPH Asia 2025</p>
+
+          <!-- Authors (copied from VChain) -->
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://yuancheng-xu.github.io/" target="_blank">Yuancheng Xu</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.cs.cornell.edu/~wenqixian/" target="_blank">Wenqi Xian</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://limacv.github.io/homepage/" target="_blank">Li Ma</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://julienphilip.com/" target="_blank">Julien Philip</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.imdb.com/name/nm6639341/" target="_blank">Ahmet Taşel</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/yiwei-evan-zhao-18584a105/" target="_blank">Yiwei Zhao</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://ryanndagreat.github.io/" target="_blank">Ryan Burgert</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://mingminghe.com/" target="_blank">Mingming He</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.imdb.com/name/nm6479275/" target="_blank">Oliver Hermann</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://de.linkedin.com/in/oliverpilarski" target="_blank">Oliver Pilarski</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://rahuldotgarg.appspot.com/" target="_blank">Rahul Garg</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.pauldebevec.com/" target="_blank">Paul Debevec</a><sup>1</sup>,
+            </span>
+             <span class="author-block">
+              <a href="https://ningyu1991.github.io/" target="_blank">Ning Yu</a><sup>&#8224</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">&#8224 project lead</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup> Eyeline Labs &nbsp;&nbsp; <sup>2</sup> Netflix </span>
+          </div>
+
+          <!-- Links (same as VChain) -->
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2510.05094" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="https://github.com/Eyeline-Labs/VChain" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>GitHub</span>
+                </a>
+              </span> -->
+              <!-- <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=HV4uAHJwt1k" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-youtube"></i></span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Supplementary Video + Abstract (tight, larger video) -->
+<section id="vb-video-abstract" class="section" style="padding-top:0.5rem; padding-bottom:0.5rem;">
+  <div class="container is-max-desktop">
+
+    <!-- Video (centered and larger) -->
+    <div class="columns is-centered has-text-centered" style="margin:0;">
+      <div class="column is-four-fifths" style="margin:0;">
+        <div class="publication-video" style="margin:0;">
+          <video
+            controls
+            autoplay
+            muted
+            loop
+            playsinline
+            style="width:100%; max-width:1100px; border-radius:12px; box-shadow:0 3px 15px rgba(0,0,0,0.15); display:block; margin:0 auto;"
+          >
+            <source src="assets/contents/supp_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tiny spacer -->
+    <div style="height:6px;"></div>
+
+    <!-- Abstract -->
+    <div class="columns is-centered has-text-centered" style="margin:0;">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="margin:0;">Abstract</h2>
+        <div class="content has-text-justified" style="margin-top:6px;">
+          <p>
+            We introduce a framework that enables both multi-view character consistency and 3D camera control in video diffusion models through a novel customization data pipeline. 
+            We train the character consistency component with recorded volumetric capture performances re-rendered with diverse camera trajectories via 4D Gaussian Splatting (4DGS), lighting variability obtained with a video relighting model. 
+            We fine-tune state-of-the-art open-source video diffusion models on this data to provide strong multi-view identity preservation, precise camera control, and lighting adaptability. 
+            Our framework also supports core capabilities for virtual production, including multi-subject generation using two approaches: joint training and noise blending, the latter enabling efficient composition of independently customized models at inference time; 
+            it also achieves scene and real-life video customization as well as control over motion and spatial layout during customization.
+            Extensive experiments show improved video quality, higher personalization accuracy, and enhanced camera control and lighting adaptability, advancing the integration of video generation into virtual production.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- Navigation (kept from Virtually Being, styled to fit VChain) -->
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+  <div class="container is-max-desktop">
+    <table class="menu-table">
+      <tr>
+        <td><a class="menu-link" href="#4dgs-data">Human Data from Volumetric Captures</a></td>
+        <td><a class="menu-link" href="#t2v-baselines">Comparison with Customization Baselines</a></td>
+        <td><a class="menu-link" href="#t2v-camera">T2V Generation with Camera Control</a></td>
+      </tr>
+      <tr>
+        <td><a class="menu-link" href="#multi-view">Multi-view Data Effect</a></td>
+        <td><a class="menu-link" href="#lighting-effect">Relit Data Effect</a></td>
+        <td><a class="menu-link" href="#t2v-multisubject">Multi-subject Generation</a></td>
+      </tr>
+      <tr>
+        <td><a class="menu-link" href="#joint-subject">Joint-subject Data Effect</a></td>
+        <td><a class="menu-link" href="#i2v-customized-or-not">I2V Customization for ID Preservation</a></td>
+        <td><a class="menu-link" href="#i2v-camera">I2V Customization with Camera Control</a></td>
+      </tr>
+      <tr>
+        <td><a class="menu-link" href="#real-life">Real-life Data</a></td>
+        <td><a class="menu-link" href="#scene">Scene Customization</a></td>
+        <td><a class="menu-link" href="#gwtf">Motion and Spatial Layout Control</a></td>
+      </tr>
+    </table>
+  </div>
+</nav>
+
+<!-- ===== 4DGS DATA ===== -->
+<section id="4dgs-data" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Human Data from Volumetric Captures</h2>
+        <div class="content has-text-justified">
+          <p>
+            We record multi-view performances, apply 4D Gaussian Splatting, and render videos with diverse camera motion and lighting for customization.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/4DGS/single_subject.mp4" type="video/mp4">
+    </video>
+    <div class="card-body">
+      <table class="vb-cap-table">
+        <tr>
+          <td>Single-subject data from 4DGS with diverse camera motion and multi-view information of the subjects.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/4DGS/relit.mp4" type="video/mp4">
+    </video>
+    <div class="card-body">
+      <table class="vb-cap-table">
+        <tr>
+          <td>Relit data with diverse lighting conditions.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/4DGS/joint_data.mp4" type="video/mp4">
+    </video>
+    <div class="card-body">
+      <table class="vb-cap-table">
+        <tr>
+          <td>Joint-subject dataset featuring both subjects in the same video.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== T2V BASELINES ===== -->
+<section id="t2v-baselines" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Comparison with Text-to-Video Customization Baselines</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our approach shows higher multi-view identity preservation. Notably, our method outperforms ConsisID, which uses only a single facial image at inference and struggles with identity consistency across views—highlighting the value of multi-view data in our pipeline.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <img src="assets/contents/T2V_baselines/alex_reference/alex_reference.001.jpeg" alt="Alex references">
+    <div class="card-body">
+      <table class="vb-cap-table">
+        <tr>
+          <td class="chalk" style="width:15%">Magic-Me</td>
+          <td class="chalk" style="width:12%">DreamVideo</td>
+          <td class="chalk" style="width:15%">VideoBooth</td>
+          <td class="chalk" style="width:16%">MotionBooth</td>
+          <td class="chalk" style="width:22%">ConsisID</td>
+          <td class="chalk" style="width:60%">Ours</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/T2V_baselines/alex.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <img src="assets/contents/T2V_baselines/emily_reference/emily_reference.001.jpeg" alt="Emily references">
+    <div class="card-body">
+      <table class="vb-cap-table">
+        <tr>
+          <td class="chalk" style="width:15%">Magic-Me</td>
+          <td class="chalk" style="width:12%">DreamVideo</td>
+          <td class="chalk" style="width:15%">VideoBooth</td>
+          <td class="chalk" style="width:16%">MotionBooth</td>
+          <td class="chalk" style="width:22%">ConsisID</td>
+          <td class="chalk" style="width:60%">Ours</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/T2V_baselines/emily.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== T2V CAMERA ===== -->
+<section id="t2v-camera" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Text-to-Video Generation with Camera Conditions</h2>
+        <div class="content has-text-justified">
+          <p>
+            Here are more results of subject-specific customization with camera control, along with the input camera trajectories. Our method supports precise 3D camera motion—such as rotation and forward movement—unlike prior customization methods like MotionBooth, which are limited to simple 2D translations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/T2V_more/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== MULTI-VIEW ===== -->
+<section id="multi-view" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Importance of Multi-view Data</h2>
+        <div class="content has-text-justified">
+          <p>
+            To examine the role of multi-view data, we conducted an ablation using only frontal-view training videos. The results show noticeably worse identity preservation from side views, highlighting the importance of multi-view training for consistent identity across angles.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/Multi-view/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== LIGHTING ===== -->
+<section id="lighting-effect" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Importance of Relit Data</h2>
+        <div class="content has-text-justified">
+          <p>
+            Without relit data, the generated videos show flat and unrealistic lighting. In contrast, adding relit data significantly improves lighting realism and diversity.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/lighting/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== T2V MULTI-SUBJECT ===== -->
+<section id="t2v-multisubject" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Multi-subject Generation</h2>
+        <div class="content has-text-justified">
+          <p>
+            To enable text-to-video generation for multi-subject scenarios, we customized the model on individual subject datasets and a small joint dataset with both subjects. Results show that our model can accurately generate both identities together in the same scene.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/T2V_multiSubject/T2V_multiSubject.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== T2V MULTI-SUBJECT (NOISE BLENDING) ===== -->
+<section id="t2v-multisubject-noiseBlending" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Multi-subject Generation with Noise Blending</h2>
+        <div class="content has-text-justified">
+          <p>
+            Instead of jointly customizing one model on all subjects, we propose another approach, where each subject is customized independently—resulting in separate single-subject models. At inference time, we use noise blending technique to leverage single-subject models to generate multi-subject videos. This produces realistic videos with both subjects, without joint training.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/OMG_multisubject/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== JOINT-SUBJECT DATA ===== -->
+<section id="joint-subject" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Importance of Joint-subject Data</h2>
+        <div class="content has-text-justified">
+          <p>
+            To evaluate the impact of joint-subject data featuring both subjects in the same video, which are shown on the left, we compare models trained with and without them. As shown on the right, including joint-subject data leads to more realistic spatial relationships and more natural interactions between the two subjects.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/joint_data/joint_data.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== I2V CUSTOMIZED OR NOT ===== -->
+<section id="i2v-customized-or-not" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Image-to-video Customization is Necessary</h2>
+        <div class="content has-text-justified">
+          <p>
+            We also explore customization for image-to-video models. Even when the input frame preserves the identity well, without multi-view customization, the generated videos show noticeable identity loss over time. In contrast, customizing the model with multi-view data helps maintain consistent identity throughout the entire video.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/I2V_customized_or_not/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== I2V CAMERA ===== -->
+<section id="i2v-camera" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Image-to-video Customization with Camera Control</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our approach also enables image-to-video customization with camera conditions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/I2V_more/I2V_more.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== REAL-LIFE ===== -->
+<section id="real-life" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Real-life Data</h2>
+        <div class="content has-text-justified">
+          <p>
+            Beyond 4DGS human data, we validate our method on a real-world customization dataset featuring a cat with estimated camera parameters. As shown, our model generates videos of the same cat in new contexts, preserving identity across views and enabling controllable camera motion.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/cat/cat.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== SCENE CUSTOMIZATION ===== -->
+<section id="scene" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Scene Customization</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our method also supports scene customization, allowing the model to capture interactions between subjects and their environment. Here, we show examples with both customized scenes and one or more subjects, where the generated videos depict realistic interactions between the subjects within the shared environment.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/scene/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- ===== GO WITH THE FLOW ===== -->
+<section id="gwtf" class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 vb-section-title">Motion and Spatial Layout Control</h2>
+        <div class="content has-text-justified">
+          <p>
+            Beyond camera control, we further explore controlling the subjects' motion and spatial layout within the video by customizing the go-with-the-flow model with optical flow conditions. The resulting videos largely preserve the motion patterns and spatial arrangements from the source video while generating the appearance of the customized subjects.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vb-slide-wrap">
+  <div class="vb-card">
+    <video autoplay loop muted playsinline>
+      <source src="assets/contents/go_with_the_flow/main.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<!-- BibTeX (same as VChain) -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <p>If you find our work useful, please consider citing our paper:</p>
+    <pre><code>
+@article{huang2025vchain,
+  title={{VChain}: Chain-of-Visual-Thought for Reasoning in Video Generation},
+  author = {Huang, Ziqi and Yu, Ning and Chen, Gordon and Qiu, Haonan and Debevec, Paul and Liu, Ziwei},
+  journal={arXiv preprint arXiv:2510.05094},
+  year={2025}
+}
+    </code></pre>
+  </div>
+</section>
+
+<!-- Footer (VChain-style minimalist) -->
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://arxiv.org/abs/2510.05094" target="_blank">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/Eyeline-Labs/VChain" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+      <a class="icon-link" href="https://www.youtube.com/watch?v=HV4uAHJwt1k" target="_blank">
+        <i class="fab fa-youtube"></i>
+      </a>
+      <p>
+        <small>Website layout based on the VChain project page. If you reuse the original
+        <a href="https://nerfies.github.io/" target="_blank">Nerfies</a> template, please credit them appropriately.</small>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- VChain scripts (optional to repeat at end) -->
+<script src="./assets/js/bulma-carousel.min.js"></script>
+<script src="./assets/js/bulma-slider.min.js"></script>
+<script src="./assets/js/index.js"></script>
+
+</body>
+</html>
